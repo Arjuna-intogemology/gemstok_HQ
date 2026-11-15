@@ -1,0 +1,83 @@
+{
+  "about": "Gemstok HQ release plans. Edit in HQ → Releases (or here; HQ re-reads it). status: planned · building · testing · review · live",
+  "releases": [
+    {
+      "id": "seed-mkv",
+      "app": "manikvault",
+      "version": "next",
+      "status": "planned",
+      "target": "",
+      "notes": "From the HQ app-changes plan.",
+      "items": [
+        {
+          "text": "Count an app open at start-up (not only Browse)",
+          "done": false
+        },
+        {
+          "text": "record_signup() once for new accounts",
+          "done": false
+        },
+        {
+          "text": "Android: campaign tag from the Play install referrer",
+          "done": false
+        },
+        {
+          "text": "\"How did you hear about us?\" (optional)",
+          "done": false
+        },
+        {
+          "text": "Android credit buys through the newer purchase function",
+          "done": false
+        }
+      ]
+    },
+    {
+      "id": "seed-gb",
+      "app": "gem_broker",
+      "version": "next",
+      "status": "planned",
+      "target": "",
+      "notes": "From the HQ app-changes plan.",
+      "items": [
+        {
+          "text": "Count an app open at start-up (not only Market)",
+          "done": false
+        },
+        {
+          "text": "record_signup() once for new accounts",
+          "done": false
+        },
+        {
+          "text": "Android: campaign tag from the Play install referrer",
+          "done": false
+        },
+        {
+          "text": "\"How did you hear about us?\" (optional)",
+          "done": false
+        },
+        {
+          "text": "Market views for every listed stone (database first)",
+          "done": false
+        }
+      ]
+    },
+    {
+      "id": "seed-quvlet",
+      "app": "quvlet",
+      "version": "next",
+      "status": "planned",
+      "target": "",
+      "notes": "At Quvlet's launch.",
+      "items": [
+        {
+          "text": "record_signup() once for new accounts",
+          "done": false
+        },
+        {
+          "text": "\"How did you hear about us?\" (optional)",
+          "done": false
+        }
+      ]
+    }
+  ]
+}

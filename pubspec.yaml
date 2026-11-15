@@ -1,0 +1,32 @@
+name: gemstok_hq
+description: "Gemstok HQ — Arjuna's private macOS view of the whole Gemstok business."
+publish_to: 'none'
+version: 0.1.0+1
+
+environment:
+  sdk: ^3.12.0
+  flutter: ">=3.44.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  local_auth: ^3.0.2               # Touch ID
+  flutter_secure_storage: ^9.2.4   # macOS Keychain
+  postgres: ^3.5.0                 # read-only DB connections (SSL)
+  qr_flutter: ^4.1.0               # campaign QR codes
+  dart_jsonwebtoken: ">=2.14.0 <4.0.0"  # signs App Store Connect + Google tokens (on this Mac)
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/certs/                # put supabase-ca.crt here (see README) — optional
+    - assets/logo/hq_logo.png      # sidebar + lock screen
+  fonts:
+    - family: Jost
+      fonts:
+        - asset: assets/fonts/Jost.ttf   # variable font: weights set with fontVariations
