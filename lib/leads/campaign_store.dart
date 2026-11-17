@@ -41,6 +41,11 @@ class Campaign {
   /// For QR codes: the same, but the phone goes straight to its store.
   String get qrLink => '$link&go=1';
 
+  /// An approved agent's permanent link: the campaign link + their agent code (`a=`). The app's scanner reads
+  /// the code and records the referral (only when scanned IN the app within 1 day of signing up).
+  String agentLink(String code) => '$link&a=$code';
+  String agentQrLink(String code) => '${agentLink(code)}&go=1';
+
   Map<String, dynamic> toJson() => {
         'tag': tag,
         'name': name,

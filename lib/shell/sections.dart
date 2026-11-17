@@ -29,8 +29,10 @@ enum HqSection {
 
   releases('Releases', 'Per app: version on this Mac vs versions in use, and the planned updates with checklists.',
       group: 'System', ready: true),
+  renewals('Renewals', 'Keys, secrets and memberships that expire — countdown, warning on Today 30 days before.',
+      group: 'System', ready: true),
   servers('Servers', 'Status, edge functions, logs, keep alive, cron jobs, app switches.', group: 'System', ready: true),
-  storage('Storage', 'Database size per project vs the free 500 MB.', group: 'System', ready: true),
+  storage('Storage', 'Database sizes (500 MB each) and R2 photo storage (10 GB), as pies.', group: 'System', ready: true),
 
   ask('ASK', 'Save a question; say "answer" in the Claude chat; the answer shows here.', ready: true),
   settings('Settings', 'Keys and connection checks.', ready: true);

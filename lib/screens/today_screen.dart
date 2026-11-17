@@ -3,14 +3,16 @@ import 'package:flutter/material.dart';
 import '../app_theme.dart';
 import '../db/hq_data.dart';
 import '../db/queries.dart';
+import '../renewals/renewals_screen.dart';
 import '../widgets/format.dart';
 import '../widgets/screen_frame.dart';
 import '../widgets/source_line.dart';
 
 /// Today: sign-ups, active people, credits bought (today / last 7 days) + one health check.
 class TodayScreen extends StatelessWidget {
-  const TodayScreen({super.key, required this.data});
+  const TodayScreen({super.key, required this.data, this.onOpenRenewals});
   final HqData data;
+  final VoidCallback? onOpenRenewals;
 
   /// Market listings from ManiKVault data — or a grey card until that database is connected.
   Widget _stonesCard() {
@@ -35,9 +37,11 @@ class TodayScreen extends StatelessWidget {
       body: () {
         final row = data.rows(Q.today)?.firstOrNull;
         final at = data.loadedAt(Q.today) ?? DateTime.now();
-        if (row == null) return [];
+        final renewals = RenewalsBanner(onOpen: onOpenRenewals ?? () {});
+        if (row == null) return [renewals];
         final orphans = (row['logins_without_member'] as int?) ?? 0;
         return [
+          renewals,
           Wrap(
             spacing: 14,
             runSpacing: 14,

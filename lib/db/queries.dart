@@ -151,6 +151,22 @@ limit 30
 ''');
 
   /// Names for the Ideas "From" search. Kept in HQ's memory only; never in an ASK snapshot.
+  /// Approved agents (codes issued from HQ) and the people each one brought in (QR scanned in the app).
+  /// Needs gemstok/sql/2026-11-15_agent_referrals.
+  static const agents = HqQuery('agents', 'gemstok', 'Gemstok · agent_codes, agent_referrals', '''
+select a.gemstok_id as agent_gsm, a.name as agent_name, c.code, c.active, c.created_at,
+       count(r.member_id)::int as brought_in,
+       coalesce(json_agg(json_build_object('gsm', m.gemstok_id, 'name', m.name, 'app', r.app,
+                                           'device', r.device_os, 'at', r.scanned_at)
+                         order by r.scanned_at desc) filter (where r.member_id is not null), '[]')::text as people
+from public.agent_codes c
+join public.members a on a.id = c.agent_id
+left join public.agent_referrals r on r.agent_id = c.agent_id
+left join public.members m on m.id = r.member_id
+group by 1, 2, 3, 4, 5
+order by brought_in desc
+''', optional: true);
+
   static const memberNames = HqQuery('member_names', 'gemstok', 'Gemstok · members', '''
 select id::text as id, gemstok_id, name, username
 from public.members

@@ -110,6 +110,10 @@ class ServicesData extends ChangeNotifier {
 
   // Cloudflare: site name → days (date, requests, pageViews, uniques, bytes, threats)
   final cfDaily = <String, List<Map<String, dynamic>>>{};
+  // Cloudflare R2: buckets (bucket, bytes, objects); its own error so website visits still show if R2 fails
+  var r2Buckets = <Map<String, dynamic>>[];
+  String? r2Error;
+  DateTime? r2LoadedAt;
   // App Store: day → title → {downloads, redownloads, updates, iap, proceeds{cur: amount}}
   final asSales = <DateTime, Map<String, Map<String, dynamic>>>{};
   final asReviews = <String, List<Map<String, dynamic>>>{}; // app name → newest reviews
@@ -179,6 +183,17 @@ class ServicesData extends ChangeNotifier {
     cfDaily
       ..clear()
       ..addAll(next);
+    try {
+      final r2 = <Map<String, dynamic>>[];
+      for (final acc in await Cloudflare.accountIds(t)) {
+        r2.addAll(await Cloudflare.r2Buckets(t, acc));
+      }
+      r2Buckets = r2;
+      r2Error = null;
+      r2LoadedAt = DateTime.now();
+    } catch (e) {
+      r2Error = '$e';
+    }
   }
 
   Future<void> _appStore(Map<String, String> k) async {

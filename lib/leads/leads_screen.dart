@@ -1,12 +1,19 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:local_auth/local_auth.dart';
+import 'package:postgres/postgres.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
+import '../actions/action_log.dart';
 import '../app_theme.dart';
 import '../db/hq_data.dart';
+import '../db/hq_db.dart';
+import '../db/projects.dart';
 import '../db/queries.dart';
+import '../settings/key_store.dart';
 import '../widgets/format.dart';
 import '../widgets/screen_frame.dart';
 import 'campaign_store.dart';
@@ -42,7 +49,7 @@ class _LeadsScreenState extends State<LeadsScreen> {
   @override
   void initState() {
     super.initState();
-    widget.data.use(const [Q.campaignVisits, Q.campaignSignups, Q.memberNames]);
+    widget.data.use(const [Q.campaignVisits, Q.campaignSignups, Q.memberNames, Q.agents]);
     _load();
   }
 
@@ -222,8 +229,12 @@ class _LeadsScreenState extends State<LeadsScreen> {
 
   Future<void> _savePng(Campaign c) async {
     try {
+      final code = _agentOf(c)?['code'] as String?;
       final f = await QrExport.savePng(c,
-          title: 'Get ${CampaignStore.sites[c.site]!.$1}', byLine: c.isPerson ? 'shared by ${c.name}' : null);
+          title: 'Get ${CampaignStore.sites[c.site]!.$1}',
+          byLine: c.isPerson ? (code != null ? 'your agent: ${c.name}' : 'shared by ${c.name}') : null,
+          data: code == null ? null : c.agentQrLink(code),
+          linkText: code == null ? null : c.agentLink(code));
       await QrExport.showInFinder(f);
       if (mounted) setState(() => _info = 'QR saved: leads/qr/${c.tag}.png (opened in Finder).');
     } catch (e) {
@@ -374,7 +385,10 @@ class _LeadsScreenState extends State<LeadsScreen> {
           Container(
             color: Colors.white,
             padding: const EdgeInsets.all(6),
-            child: QrImageView(data: c.qrLink, size: 120, backgroundColor: Colors.white),
+            child: QrImageView(
+                data: _agentOf(c) == null ? c.qrLink : c.agentQrLink(_agentOf(c)!['code'] as String),
+                size: 120,
+                backgroundColor: Colors.white),
           ),
           const SizedBox(width: 18),
           Expanded(
@@ -418,10 +432,151 @@ class _LeadsScreenState extends State<LeadsScreen> {
               ]),
               const SizedBox(height: 6),
               Text(_numbers(c), style: jost(13, weight: 500)),
+              if (c.isPerson) _agentBlock(c),
             ]),
           ),
         ]),
       ),
+    );
+  }
+
+  // ------------------------------------------------------------------ approved agents (QR referrals)
+
+  /// The agent row for a person campaign that is linked to a member, or null.
+  Map<String, dynamic>? _agentOf(Campaign c) {
+    if (!c.isPerson || c.memberGsm.isEmpty) return null;
+    return widget.data.rows(Q.agents)?.where((r) => r['agent_gsm'] == c.memberGsm).firstOrNull;
+  }
+
+  final Set<String> _openPeople = {}; // agents whose "brought in" list is open
+  bool _agentBusy = false;
+
+  /// Confirm → Touch ID → hq_operator function → action log → reload.
+  Future<void> _agentAction(String title, String what, String sql, List<Object?> params, String action,
+      Map<String, Object?> details) async {
+    final sure = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(title, style: jost(18, weight: 600)),
+        content: SizedBox(
+          width: 460,
+          child: Text('$what\n\nTouch ID is asked next; this is written to HQ\'s action log.', style: jost(14)),
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancel')),
+          FilledButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('Yes, do it')),
+        ],
+      ),
+    );
+    if (sure != true) return;
+    var touched = false;
+    try {
+      touched = await LocalAuthentication().authenticate(localizedReason: title.toLowerCase());
+    } catch (_) {}
+    if (!touched) return;
+    setState(() {
+      _agentBusy = true;
+      _error = null;
+      _info = null;
+    });
+    Connection? conn;
+    try {
+      if (!await KeyStore.isSet(hqOperatorProject.id)) {
+        throw const HqDbError('Add the Actions login (hq_operator) in Settings first.');
+      }
+      conn = await HqDb.open(hqOperatorProject); // refuses anything but hq_operator
+      await conn.execute(sql, parameters: params);
+      await ActionLog.write(action, details, ok: true);
+      _info = '$title — done.';
+    } catch (e) {
+      _error = '$e';
+      await ActionLog.write(action, details, ok: false, error: '$e');
+    } finally {
+      await conn?.close();
+    }
+    await widget.data.refresh(const [Q.agents]);
+    if (mounted) setState(() => _agentBusy = false);
+  }
+
+  Widget _agentBlock(Campaign c) {
+    if (c.memberGsm.isEmpty) {
+      return Padding(
+        padding: const EdgeInsets.only(top: 6),
+        child: Text('Not linked to a Gemstok member — link one to make them an approved agent.',
+            style: jost(12, color: HqColors.muted)),
+      );
+    }
+    if (widget.data.rows(Q.agents) == null) return const SizedBox.shrink(); // still loading / not set up
+    final a = _agentOf(c);
+    if (a == null) {
+      return Padding(
+        padding: const EdgeInsets.only(top: 8),
+        child: OutlinedButton.icon(
+          icon: const Icon(Icons.verified_user_outlined, size: 16),
+          onPressed: _agentBusy
+              ? null
+              : () => _agentAction(
+                    'Make approved agent',
+                    'Gives ${c.name} (${c.memberGsm}) a permanent agent code. New people who scan their QR in the app '
+                        'within 1 day of signing up are counted as brought in by them. The QR on this card changes to the '
+                        'agent QR — print it again.',
+                    r'select hq.agent_code_issue($1::text)',
+                    [c.memberGsm],
+                    'agent.issue_code',
+                    {'gsm': c.memberGsm, 'name': c.name}),
+          label: const Text('Make approved agent…'),
+        ),
+      );
+    }
+    final active = a['active'] == true;
+    final n = (a['brought_in'] as int?) ?? 0;
+    final people = [for (final p in (jsonDecode('${a['people'] ?? '[]'}') as List)) Map<String, dynamic>.from(p as Map)];
+    final open = _openPeople.contains(c.memberGsm);
+    return Container(
+      margin: const EdgeInsets.only(top: 10),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: HqColors.accent.withValues(alpha: 0.06),
+        border: Border.all(color: HqColors.accent.withValues(alpha: 0.35)),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Wrap(spacing: 10, runSpacing: 6, crossAxisAlignment: WrapCrossAlignment.center, children: [
+          Text(active ? 'Approved agent' : 'Agent — paused', style: jost(13, weight: 600, color: active ? HqColors.accent : HqColors.warn)),
+          Text('code ${a['code']}', style: jost(12, color: HqColors.muted)),
+          Text('Brought in: $n', style: jost(15, weight: 600)),
+          if (n > 0)
+            TextButton(
+              onPressed: () => setState(() => open ? _openPeople.remove(c.memberGsm) : _openPeople.add(c.memberGsm)),
+              child: Text(open ? 'Hide people' : 'Show people'),
+            ),
+          TextButton(
+            onPressed: _agentBusy
+                ? null
+                : () => _agentAction(
+                      active ? 'Pause agent' : 'Restart agent',
+                      active
+                          ? 'New scans of ${c.name}\'s QR stop counting. People already brought in stay counted. The code stays the same.'
+                          : '${c.name}\'s QR starts counting again (same code, same QR).',
+                      r'select hq.agent_code_set_active($1::text, $2::boolean)',
+                      [c.memberGsm, !active],
+                      active ? 'agent.pause' : 'agent.restart',
+                      {'gsm': c.memberGsm, 'active': !active}),
+            child: Text(active ? 'Pause agent' : 'Restart agent'),
+          ),
+        ]),
+        Text('The QR on this card is the agent QR. New users must scan it inside the app within 1 day of signing up.',
+            style: jost(12, color: HqColors.muted)),
+        if (open)
+          for (final p in people)
+            Padding(
+              padding: const EdgeInsets.only(top: 4),
+              child: Text(
+                  '${p['name'] ?? '–'} · ${p['gsm'] ?? ''} · ${p['app'] ?? '?'} (${p['device'] ?? '?'}) · '
+                  '${fmtDate(DateTime.tryParse('${p['at']}'))}',
+                  style: jost(13)),
+            ),
+      ]),
     );
   }
 

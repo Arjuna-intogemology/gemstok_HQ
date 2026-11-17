@@ -1,0 +1,37 @@
+{
+  "about": "Gemstok HQ renewals — dates only, never keys. Edit in HQ → Renewals (or here; HQ re-reads it).",
+  "renewals": [
+    {
+      "id": "apple-signin-secret",
+      "name": "Sign in with Apple — client secret",
+      "what": "Apple sign-in on the websites and Android stops working for everyone (iPhone apps keep working).",
+      "lifetime_days": 180,
+      "how_to": "gemstok-backend/docs/runbooks/apple-client-secret.md → paste into Supabase → Gemstok → Authentication → Providers → Apple → Secret Key",
+      "notes": ""
+    },
+    {
+      "id": "apple-developer",
+      "name": "Apple Developer Program membership",
+      "what": "Apps leave the App Store, TestFlight and Sign in with Apple stop.",
+      "lifetime_days": 365,
+      "how_to": "developer.apple.com → Account → Membership (turn on auto-renew)",
+      "notes": ""
+    },
+    {
+      "id": "cloudflare-token",
+      "name": "Cloudflare API token (Gemstok HQ)",
+      "what": "HQ → Websites and the R2 pie stop loading.",
+      "lifetime_days": 365,
+      "how_to": "dash.cloudflare.com → My Profile → API Tokens → Gemstok HQ → Roll, then HQ → Settings → Replace",
+      "notes": "Only if you chose \"1 year\" when making it. No expiry → set no date."
+    },
+    {
+      "id": "admob-signin",
+      "name": "AdMob sign-in in HQ (Google, Testing mode)",
+      "what": "HQ → Money: AdMob turns red.",
+      "lifetime_days": 7,
+      "how_to": "HQ → Settings → Other services → AdMob → Sign in with Google",
+      "notes": "Only while the consent screen is in Testing. \"In production\" → it doesn't expire; remove this."
+    }
+  ]
+}

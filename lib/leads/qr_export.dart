@@ -13,13 +13,13 @@ class QrExport {
   static const _h = 1450.0;
   static const _pad = 110.0;
 
-  static Future<File> savePng(Campaign c, {required String title, String? byLine}) async {
+  static Future<File> savePng(Campaign c, {required String title, String? byLine, String? data, String? linkText}) async {
     final recorder = ui.PictureRecorder();
     final canvas = Canvas(recorder);
     canvas.drawRect(const Rect.fromLTWH(0, 0, _w, _h), Paint()..color = Colors.white);
 
     final painter = QrPainter(
-      data: c.qrLink,
+      data: data ?? c.qrLink,
       version: QrVersions.auto,
       errorCorrectionLevel: QrErrorCorrectLevel.M,
       gapless: true,
@@ -45,7 +45,7 @@ class QrExport {
     }
 
     text(title, _pad + qrSize + 40, 64, FontWeight.w600, Colors.black);
-    text(c.link.replaceFirst('https://', ''), _pad + qrSize + 130, 36, FontWeight.w400, const Color(0xFF555555));
+    text((linkText ?? c.link).replaceFirst('https://', ''), _pad + qrSize + 130, 36, FontWeight.w400, const Color(0xFF555555));
     if (byLine != null && byLine.isNotEmpty) {
       text(byLine, _pad + qrSize + 185, 40, FontWeight.w500, const Color(0xFF333333));
     }

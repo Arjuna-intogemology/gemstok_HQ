@@ -9,6 +9,7 @@ import '../keepalive/keep_alive.dart';
 import '../leads/leads_screen.dart';
 import '../lock/lock_controller.dart';
 import '../releases/releases_screen.dart';
+import '../renewals/renewals_screen.dart';
 import '../screens/doing_screen.dart';
 import '../screens/downloads_screen.dart';
 import '../screens/joining_screen.dart';
@@ -238,7 +239,12 @@ class _HqShellState extends State<HqShell> {
   }
 
   Widget _page(HqSection s) => switch (s) {
-        HqSection.today => TodayScreen(data: _data),
+        HqSection.today => TodayScreen(
+            data: _data,
+            onOpenRenewals: () => setState(() {
+                  _open = HqSection.renewals;
+                  _openGroups.add('System');
+                })),
         HqSection.joining => JoiningScreen(data: _data),
         HqSection.using => UsingScreen(data: _data),
         HqSection.staying => UsingScreen(data: _data, staying: true),
@@ -249,9 +255,10 @@ class _HqShellState extends State<HqShell> {
         HqSection.leads => LeadsScreen(data: _data),
         HqSection.websites => WebsitesScreen(services: _services),
         HqSection.downloads => DownloadsScreen(services: _services),
-        HqSection.storage => StorageScreen(data: _data),
+        HqSection.storage => StorageScreen(data: _data, services: _services),
         HqSection.blogs => const BlogsScreen(),
         HqSection.releases => ReleasesScreen(data: _data),
+        HqSection.renewals => const RenewalsScreen(),
         HqSection.money => MoneyScreen(data: _data, services: _services),
         HqSection.servers => ServersScreen(keepAlive: widget.keepAlive, servers: _servers, data: _data),
         HqSection.ask => AskScreen(data: _data),
