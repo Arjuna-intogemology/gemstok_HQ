@@ -39,13 +39,13 @@ const hqProjects = <HqProject>[
       holds: 'posts · circles · comments · post reports (counts)'),
   HqProject(
       id: 'quvlet_video', name: 'Quvlet video', ref: 'xpilkkhssgpmvdgqrydf',
-      holds: 'later', inStep1: false),
+      holds: 'videos · likes · video reports (counts)'),
   HqProject(
       id: 'tracegems', name: 'TraceGems', ref: 'otlkrgbqehnrrnkqiqan',
-      holds: 'later', inStep1: false),
+      holds: 'TraceGems records (counts)'),
   HqProject(
       id: 'websites', name: 'IntoGemology', ref: 'gtlvlumpgbztpjtfnkdn',
-      holds: 'later', inStep1: false),
+      holds: 'waitlist · subscribers · contacts (counts) · campaign clicks'),
 ];
 
 /// HQ's ACTION login (Gemstok): may only call hq.set_maintenance / hq.set_min_version.
@@ -54,6 +54,6 @@ const hqOperatorProject = HqProject(
   id: 'gemstok_operator',
   name: 'Actions login (hq_operator)',
   ref: 'odcwzqiwfngozjztnfzm',
-  holds: 'maintenance switches — changes data only through 2 checked functions',
+  holds: 'app switches + agent codes — changes data only through checked functions',
   role: 'hq_operator',
 );

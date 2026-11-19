@@ -16,6 +16,7 @@ import '../screens/joining_screen.dart';
 import '../screens/money_screen.dart';
 import '../screens/people_screen.dart';
 import '../screens/reports_screen.dart';
+import '../screens/restores_screen.dart';
 import '../screens/servers_screen.dart';
 import '../screens/storage_screen.dart';
 import '../screens/today_screen.dart';
@@ -244,6 +245,10 @@ class _HqShellState extends State<HqShell> {
             onOpenRenewals: () => setState(() {
                   _open = HqSection.renewals;
                   _openGroups.add('System');
+                }),
+            onOpenSection: (sec) => setState(() {
+                  _open = sec;
+                  if (sec.group != null) _openGroups.add(sec.group!);
                 })),
         HqSection.joining => JoiningScreen(data: _data),
         HqSection.using => UsingScreen(data: _data),
@@ -251,6 +256,7 @@ class _HqShellState extends State<HqShell> {
         HqSection.doing => DoingScreen(data: _data),
         HqSection.people => PeopleScreen(data: _data),
         HqSection.reports => ReportsScreen(data: _data),
+        HqSection.restores => RestoresScreen(data: _data),
         HqSection.ideas => IdeasScreen(data: _data),
         HqSection.leads => LeadsScreen(data: _data),
         HqSection.websites => WebsitesScreen(services: _services),

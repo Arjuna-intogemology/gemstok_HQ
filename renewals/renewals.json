@@ -32,6 +32,213 @@
       "lifetime_days": 7,
       "how_to": "HQ → Settings → Other services → AdMob → Sign in with Google",
       "notes": "Only while the consent screen is in Testing. \"In production\" → it doesn't expire; remove this."
+    },
+    {
+      "id": "domain-gemstok-com",
+      "name": "Domain — gemstok.com",
+      "what": "Main site, account.gemstok.com, systems.gemstok.com, admin@/legal@ email and Sign in with Apple pages — EVERYTHING Gemstok.",
+      "lifetime_days": 365,
+      "made": "2026-01-02",
+      "how_to": "Your registrar (Porkbun or GoDaddy) → Domains → gemstok.com → check the real expiry date, auto-renew ON, card still valid.",
+      "notes": "Registered 2025-01-02 (Obsidian note says \"02/feb\" — check). Last renewal assumed 2026-01-02. Date is a guess (1-year terms) — read the real expiry at the registrar and fix it here."
+    },
+    {
+      "id": "domain-intogemology-com",
+      "name": "Domain — intogemology.com",
+      "what": "intogemology.com website, courses, blog and its sign-ups.",
+      "lifetime_days": 365,
+      "made": "2026-09-19",
+      "how_to": "Your registrar (Porkbun or GoDaddy) → Domains → intogemology.com → check the real expiry date, auto-renew ON, card still valid.",
+      "notes": "Registered 2025-09-19. Last renewal assumed 2026-09-19. Date is a guess (1-year terms) — read the real expiry at the registrar and fix it here."
+    },
+    {
+      "id": "domain-manikvault-com",
+      "name": "Domain — manikvault.com",
+      "what": "manikvault.com website, app links and privacy/terms pages the stores point to.",
+      "lifetime_days": 365,
+      "made": "2026-03-08",
+      "how_to": "Your registrar (Porkbun or GoDaddy) → Domains → manikvault.com → check the real expiry date, auto-renew ON, card still valid.",
+      "notes": "Registered 2026-03-08. Date is a guess (1-year terms) — read the real expiry at the registrar and fix it here."
+    },
+    {
+      "id": "domain-tracegems-com",
+      "name": "Domain — tracegems.com",
+      "what": "tracegems.com website.",
+      "lifetime_days": 365,
+      "made": "2026-03-08",
+      "how_to": "Your registrar (Porkbun or GoDaddy) → Domains → tracegems.com → check the real expiry date, auto-renew ON, card still valid.",
+      "notes": "Registered 2026-03-08. Date is a guess (1-year terms) — read the real expiry at the registrar and fix it here."
+    },
+    {
+      "id": "domain-quvlet-com",
+      "name": "Domain — quvlet.com",
+      "what": "quvlet.com website and app links.",
+      "lifetime_days": 365,
+      "made": "2026-05-05",
+      "how_to": "Your registrar (Porkbun or GoDaddy) → Domains → quvlet.com → check the real expiry date, auto-renew ON, card still valid.",
+      "notes": "Registered 2026-05-05. Date is a guess (1-year terms) — read the real expiry at the registrar and fix it here."
+    },
+    {
+      "id": "domain-gemmit-app",
+      "name": "Domain — gemmit.app",
+      "what": "gemmit.app website.",
+      "lifetime_days": 365,
+      "made": "2026-05-13",
+      "how_to": "Your registrar (Porkbun or GoDaddy) → Domains → gemmit.app → check the real expiry date, auto-renew ON, card still valid.",
+      "notes": "Registered 2026-05-13. Date is a guess (1-year terms) — read the real expiry at the registrar and fix it here."
+    },
+    {
+      "id": "domain-tracegem-com",
+      "name": "Domain — tracegem.com",
+      "what": "Defensive domain (redirects) — someone else could buy it.",
+      "lifetime_days": 365,
+      "made": "2026-05-14",
+      "how_to": "Your registrar (Porkbun or GoDaddy) → Domains → tracegem.com → check the real expiry date, auto-renew ON, card still valid.",
+      "notes": "Registered 2026-05-14. Date is a guess (1-year terms) — read the real expiry at the registrar and fix it here."
+    },
+    {
+      "id": "domain-traceagem-com",
+      "name": "Domain — traceagem.com",
+      "what": "Defensive domain (redirects to tracegems.com) — someone else could buy it.",
+      "lifetime_days": 365,
+      "made": "2026-05-14",
+      "how_to": "Your registrar (Porkbun or GoDaddy) → Domains → traceagem.com → check the real expiry date, auto-renew ON, card still valid.",
+      "notes": "Registered 2026-05-14. Date is a guess (1-year terms) — read the real expiry at the registrar and fix it here."
+    },
+    {
+      "id": "nipo-gemstok",
+      "name": "NIPO trademark — GEMSTOK (class 42)",
+      "what": "Not registered in Sri Lanka yet (™ claimed only) — someone else could file the name first.",
+      "lifetime_days": 0,
+      "expires": "2027-01-01",
+      "how_to": "NIPO Sri Lanka (nipo.gov.lk) → trademark application, class 42. Class is from the trademarks page — check before filing.",
+      "notes": "PLACEHOLDER: 2027-01-01 = planned filing date, not a real expiry. Once registered, set the real date (registration + 10 years) here."
+    },
+    {
+      "id": "nipo-gemstok-id",
+      "name": "NIPO trademark — GEMSTOK ID (class 42)",
+      "what": "Not registered in Sri Lanka yet (™ claimed only) — someone else could file the name first.",
+      "lifetime_days": 0,
+      "expires": "2027-01-01",
+      "how_to": "NIPO Sri Lanka (nipo.gov.lk) → trademark application, class 42. Class is from the trademarks page — check before filing.",
+      "notes": "PLACEHOLDER: 2027-01-01 = planned filing date, not a real expiry. Once registered, set the real date (registration + 10 years) here."
+    },
+    {
+      "id": "nipo-manikvault",
+      "name": "NIPO trademark — MANIKVAULT (class 35)",
+      "what": "Not registered in Sri Lanka yet (™ claimed only) — someone else could file the name first.",
+      "lifetime_days": 0,
+      "expires": "2027-01-01",
+      "how_to": "NIPO Sri Lanka (nipo.gov.lk) → trademark application, class 35. Class is from the trademarks page — check before filing.",
+      "notes": "PLACEHOLDER: 2027-01-01 = planned filing date, not a real expiry. Once registered, set the real date (registration + 10 years) here."
+    },
+    {
+      "id": "nipo-quvlet",
+      "name": "NIPO trademark — QUVLET (class 38)",
+      "what": "Not registered in Sri Lanka yet (™ claimed only) — someone else could file the name first.",
+      "lifetime_days": 0,
+      "expires": "2027-01-01",
+      "how_to": "NIPO Sri Lanka (nipo.gov.lk) → trademark application, class 38. Class is from the trademarks page — check before filing.",
+      "notes": "PLACEHOLDER: 2027-01-01 = planned filing date, not a real expiry. Once registered, set the real date (registration + 10 years) here."
+    },
+    {
+      "id": "nipo-gemmit",
+      "name": "NIPO trademark — GEMMIT (class 38)",
+      "what": "Not registered in Sri Lanka yet (™ claimed only) — someone else could file the name first.",
+      "lifetime_days": 0,
+      "expires": "2027-01-01",
+      "how_to": "NIPO Sri Lanka (nipo.gov.lk) → trademark application, class 38. Class is from the trademarks page — check before filing.",
+      "notes": "PLACEHOLDER: 2027-01-01 = planned filing date, not a real expiry. Once registered, set the real date (registration + 10 years) here."
+    },
+    {
+      "id": "nipo-gem-circle",
+      "name": "NIPO trademark — Gem_Circle (class 38)",
+      "what": "Not registered in Sri Lanka yet (™ claimed only) — someone else could file the name first.",
+      "lifetime_days": 0,
+      "expires": "2027-01-01",
+      "how_to": "NIPO Sri Lanka (nipo.gov.lk) → trademark application, class 38. Class is from the trademarks page — check before filing.",
+      "notes": "PLACEHOLDER: 2027-01-01 = planned filing date, not a real expiry. Once registered, set the real date (registration + 10 years) here."
+    },
+    {
+      "id": "nipo-tracegems",
+      "name": "NIPO trademark — TRACEGEMS (class 42)",
+      "what": "Not registered in Sri Lanka yet (™ claimed only) — someone else could file the name first.",
+      "lifetime_days": 0,
+      "expires": "2027-01-01",
+      "how_to": "NIPO Sri Lanka (nipo.gov.lk) → trademark application, class 42. Class is from the trademarks page — check before filing.",
+      "notes": "PLACEHOLDER: 2027-01-01 = planned filing date, not a real expiry. Once registered, set the real date (registration + 10 years) here."
+    },
+    {
+      "id": "nipo-gemstok-systems",
+      "name": "NIPO trademark — GEMSTOK SYSTEMS (class 35)",
+      "what": "Not registered in Sri Lanka yet (™ claimed only) — someone else could file the name first.",
+      "lifetime_days": 0,
+      "expires": "2027-01-01",
+      "how_to": "NIPO Sri Lanka (nipo.gov.lk) → trademark application, class 35. Class is from the trademarks page — check before filing.",
+      "notes": "PLACEHOLDER: 2027-01-01 = planned filing date, not a real expiry. Once registered, set the real date (registration + 10 years) here."
+    },
+    {
+      "id": "nipo-intogemology",
+      "name": "NIPO trademark — INTOGEMOLOGY (class 41)",
+      "what": "Not registered in Sri Lanka yet (™ claimed only) — someone else could file the name first.",
+      "lifetime_days": 0,
+      "expires": "2027-01-01",
+      "how_to": "NIPO Sri Lanka (nipo.gov.lk) → trademark application, class 41. Class is from the trademarks page — check before filing.",
+      "notes": "PLACEHOLDER: 2027-01-01 = planned filing date, not a real expiry. Once registered, set the real date (registration + 10 years) here."
+    },
+    {
+      "id": "nipo-intogem",
+      "name": "NIPO trademark — INTOGEM (class 41)",
+      "what": "Not registered in Sri Lanka yet (™ claimed only) — someone else could file the name first.",
+      "lifetime_days": 0,
+      "expires": "2027-01-01",
+      "how_to": "NIPO Sri Lanka (nipo.gov.lk) → trademark application, class 41. Class is from the trademarks page — check before filing.",
+      "notes": "PLACEHOLDER: 2027-01-01 = planned filing date, not a real expiry. Once registered, set the real date (registration + 10 years) here."
+    },
+    {
+      "id": "nipo-talkgem",
+      "name": "NIPO trademark — TALKGEM (class 41)",
+      "what": "Not registered in Sri Lanka yet (™ claimed only) — someone else could file the name first.",
+      "lifetime_days": 0,
+      "expires": "2027-01-01",
+      "how_to": "NIPO Sri Lanka (nipo.gov.lk) → trademark application, class 41. Class is from the trademarks page — check before filing.",
+      "notes": "PLACEHOLDER: 2027-01-01 = planned filing date, not a real expiry. Once registered, set the real date (registration + 10 years) here."
+    },
+    {
+      "id": "nipo-trade-ingem",
+      "name": "NIPO trademark — TRADE-inGEM (class 41)",
+      "what": "Not registered in Sri Lanka yet (™ claimed only) — someone else could file the name first.",
+      "lifetime_days": 0,
+      "expires": "2027-01-01",
+      "how_to": "NIPO Sri Lanka (nipo.gov.lk) → trademark application, class 41. Class is from the trademarks page — check before filing.",
+      "notes": "PLACEHOLDER: 2027-01-01 = planned filing date, not a real expiry. Once registered, set the real date (registration + 10 years) here."
+    },
+    {
+      "id": "nipo-market-ingem",
+      "name": "NIPO trademark — MARKET-inGEM (class 41)",
+      "what": "Not registered in Sri Lanka yet (™ claimed only) — someone else could file the name first.",
+      "lifetime_days": 0,
+      "expires": "2027-01-01",
+      "how_to": "NIPO Sri Lanka (nipo.gov.lk) → trademark application, class 41. Class is from the trademarks page — check before filing.",
+      "notes": "PLACEHOLDER: 2027-01-01 = planned filing date, not a real expiry. Once registered, set the real date (registration + 10 years) here."
+    },
+    {
+      "id": "nipo-gem-trader",
+      "name": "NIPO trademark — GEM TRADER (class 41)",
+      "what": "Not registered in Sri Lanka yet (™ claimed only) — someone else could file the name first.",
+      "lifetime_days": 0,
+      "expires": "2027-01-01",
+      "how_to": "NIPO Sri Lanka (nipo.gov.lk) → trademark application, class 41. Class is from the trademarks page — check before filing.",
+      "notes": "PLACEHOLDER: 2027-01-01 = planned filing date, not a real expiry. Once registered, set the real date (registration + 10 years) here."
+    },
+    {
+      "id": "nipo-gem-entrepreneur",
+      "name": "NIPO trademark — GEM ENTREPRENEUR (class 41)",
+      "what": "Not registered in Sri Lanka yet (™ claimed only) — someone else could file the name first.",
+      "lifetime_days": 0,
+      "expires": "2027-01-01",
+      "how_to": "NIPO Sri Lanka (nipo.gov.lk) → trademark application, class 41. Class is from the trademarks page — check before filing.",
+      "notes": "PLACEHOLDER: 2027-01-01 = planned filing date, not a real expiry. Once registered, set the real date (registration + 10 years) here."
     }
   ]
 }

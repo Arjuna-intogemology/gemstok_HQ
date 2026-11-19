@@ -45,10 +45,10 @@ app.*.map.json
 /android/app/release
 
 # Ask Claude: questions + number snapshots (business data, not code)
-ask/
+/ask/
 
 # Ideas list (can hold who suggested what)
-ideas/
+/ideas/
 
 # Campaign links can be per person (names of agents / brokers) — keep them on the Mac
 leads/campaigns.json

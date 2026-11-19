@@ -15,6 +15,8 @@ enum HqSection {
       group: 'People', ready: true),
 
   reports('Reports', 'Every report people send from the apps, in one place.', group: 'Inbox', ready: true),
+  restores('Restore requests', 'Deleted members who came back: old GSM → new TEMP id, waiting time, the SQL line to approve.',
+      group: 'Inbox', ready: true),
   ideas('Ideas', 'New ideas users bring in — noted, then New → Thinking → Planned → Done.', group: 'Inbox', ready: true),
 
   money('Money', 'Store purchases, App Store proceeds and in-app purchases, AdMob earnings.',

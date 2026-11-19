@@ -8,6 +8,9 @@ import '../app_theme.dart';
 import '../db/hq_db.dart';
 import '../db/projects.dart';
 import '../services/services_data.dart';
+import '../help/help_view.dart';
+import '../help/recovery_view.dart';
+import '../widgets/screen_frame.dart';
 import 'key_store.dart';
 import 'services_section.dart';
 import 'tokens_section.dart';
@@ -29,6 +32,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   final _checking = <String>{};
   bool? _sslVerified;
   String? _keychainError;
+  String _tab = 'keys'; // keys · help · recovery
 
   @override
   void initState() {
@@ -111,7 +115,22 @@ class _SettingsScreenState extends State<SettingsScreen> {
       padding: const EdgeInsets.all(32),
       children: [
         Text('Settings', style: jost(26, weight: 600)),
-        const SizedBox(height: 4),
+        const SizedBox(height: 10),
+        Choice<String>(
+          options: const {'keys': 'Keys & logins', 'help': 'How to use HQ', 'recovery': 'Recovery'},
+          value: _tab,
+          onChanged: (v) => setState(() => _tab = v),
+        ),
+        const SizedBox(height: 16),
+        if (_tab == 'help') const HelpView(),
+        if (_tab == 'recovery') const RecoveryView(),
+        if (_tab == 'keys') ..._keys(),
+      ],
+    );
+  }
+
+  List<Widget> _keys() {
+    return [
         Text('Each project needs its hq_reader pooler host + password. Stored only in this Mac\'s Keychain.',
             style: jost(14, color: HqColors.muted)),
         const SizedBox(height: 12),
@@ -120,8 +139,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
             color: _sslVerified! ? HqColors.good : HqColors.warn,
             text: _sslVerified!
                 ? 'SSL: encrypted and verified against the Supabase CA certificate.'
-                : 'SSL: encrypted, but the server certificate is not verified yet — '
-                    'add assets/certs/supabase-ca.crt (README step 4).',
+                : 'SSL: encrypted. The server certificate isn\'t verified yet — macOS won\'t accept Supabase\'s root '
+                    'certificate added by an app (tried 13 Nov), so verification needs "pinning" (in TODO-VIP).',
           ),
         if (_keychainError != null) _Note(color: HqColors.bad, text: _keychainError!),
         const SizedBox(height: 20),
@@ -130,12 +149,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
         ServicesSection(services: widget.services),
         const SizedBox(height: 18),
         Text('Actions login', style: jost(18, weight: 600)),
-        Text('Only for changes HQ is allowed to make (maintenance switches). Gemstok\'s pooler host + the hq_operator '
+        Text('Only for changes HQ is allowed to make (app switches, agent codes). Gemstok\'s pooler host + the hq_operator '
             'password from the app_config SQL.', style: jost(13, color: HqColors.muted)),
         const SizedBox(height: 10),
         _row(hqOperatorProject),
-      ],
-    );
+    ];
   }
 
   Widget _row(HqProject p) {

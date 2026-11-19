@@ -234,6 +234,52 @@ limit 200
 ''', optional: true);
 
   /// Reports about PEOPLE (Gemstok) — basic columns (always readable).
+  /// Restore requests: a deleted member signed in again (new TEMP- id) and asked for the old GSM back.
+  /// Needs Gemstok sql/2026-11-18_hq_restore_requests. No note, emails, PINs or names.
+  static const restoreRequests = HqQuery('restore_requests', 'gemstok', 'Gemstok · restore_requests + members, login_history, credits', '''
+select r.id::text                 as id,
+       r.old_gemstok_id,
+       r.status, r.created_at, r.decided_at,
+       -- the old (deleted) account — name/username are wiped on delete, the rest stays
+       o.id::text                 as old_id,
+       o.created_at               as old_joined,
+       o.deleted_at               as old_deleted,
+       o.tier                     as old_tier,
+       o.verified                 as old_verified,
+       o.login_count              as old_logins,
+       o.last_seen_app            as old_last_app,
+       o.last_seen_at             as old_last_seen,
+       (select string_agg(x.app || ' ×' || x.n, ', ' order by x.n desc)
+          from (select l.app, count(*) as n from public.login_history l
+                where l.member_id = o.id group by l.app) x)                       as old_apps,
+       (select count(*) from public.credit_transactions t
+          where t.member_id = o.id and t.type = 'purchase')::int                  as old_purchases,
+       (select coalesce(sum(t.amount), 0) from public.credit_transactions t
+          where t.member_id = o.id and t.metadata ->> 'reason' = 'account_deleted')::float8 as old_credits_lost,
+       -- the new (TEMP-) account
+       n.gemstok_id               as new_gemstok_id,
+       n.created_at               as new_joined,
+       n.last_seen_app            as new_last_app,
+       (select p.provider from hq.member_providers() p where p.member_id = n.id) as new_signin,
+       -- earlier requests for the same GSM
+       (select count(*) from public.restore_requests e
+          where e.old_gemstok_id = r.old_gemstok_id and e.id <> r.id)::int        as other_requests
+from public.restore_requests r
+left join public.members o on o.gemstok_id = r.old_gemstok_id
+left join public.members n on n.id = r.new_member_id
+order by (r.status = 'pending') desc, r.created_at desc
+limit 200
+''', optional: true);
+
+  /// Trust score for each restore request (old + new account). Its own query, so Restore requests still
+  /// work before Gemstok sql/2026-11-18_hq_trust_score is run.
+  static const restoreTrust = HqQuery('restore_trust', 'gemstok', 'Gemstok · members.trust_score', '''
+select r.id::text as id, o.trust_score as old_trust, n.trust_score as new_trust
+from public.restore_requests r
+left join public.members o on o.gemstok_id = r.old_gemstok_id
+left join public.members n on n.id = r.new_member_id
+''', optional: true);
+
   static const traderReports = HqQuery('trader_reports', 'gemstok', 'Gemstok · trader_reports', '''
 select id::text as id, reason, source, status, created_at, reviewed_at
 from public.trader_reports
@@ -396,10 +442,15 @@ order by 1
   /// Database size + the 5 biggest tables. Size functions need no table rights, so hq_reader can run it.
   static const _sizeSql = '''
 select pg_database_size(current_database())::bigint as bytes,
+  (select coalesce(sum(pg_total_relation_size(c.oid)), 0)::bigint
+     from pg_class c join pg_namespace n on n.oid = c.relnamespace
+     where n.nspname = 'public' and c.relkind in ('r', 'm')
+       and c.relname <> 'spatial_ref_sys')                          as app_bytes,   -- all your own tables
   (select json_agg(t) from (
      select c.relname as name, pg_total_relation_size(c.oid)::bigint as bytes
      from pg_class c join pg_namespace n on n.oid = c.relnamespace
      where n.nspname = 'public' and c.relkind = 'r'
+       and c.relname <> 'spatial_ref_sys'   -- PostGIS's own list of map systems, not your data
      order by 2 desc limit 5) t)::text as top
 ''';
 

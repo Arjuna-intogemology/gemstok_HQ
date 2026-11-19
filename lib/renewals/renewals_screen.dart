@@ -172,7 +172,12 @@ class _RenewalsScreenState extends State<RenewalsScreen> {
       ),
     );
     if (ok == true && (r == null || _list.contains(r))) {
-      final x = r ?? Renewal(id: RenewalStore.newId(), name: '', what: '', lifetimeDays: 365);
+      final x = r ??
+          Renewal(
+              id: '${switch (_group) { 'domains' => 'domain-', 'nipo' => 'nipo-', _ => '' }}${RenewalStore.newId()}',
+              name: switch (_group) { 'domains' => 'Domain — ', 'nipo' => 'NIPO trademark — ', _ => '' },
+              what: '',
+              lifetimeDays: _group == 'nipo' ? 0 : 365);
       x
         ..name = name.text.trim()
         ..what = what.text.trim()
@@ -185,21 +190,46 @@ class _RenewalsScreenState extends State<RenewalsScreen> {
     if (ok == true) await _save();
   }
 
+  /// Sub-pages: keys & memberships · domains · NIPO trademarks (from the id or name).
+  String _group = 'keys';
+  static const _groups = {'keys': 'Keys & memberships', 'domains': 'Domains', 'nipo': 'NIPO trademarks'};
+
+  static String groupOf(Renewal r) {
+    final id = r.id.toLowerCase(), name = r.name.toLowerCase();
+    if (id.startsWith('domain-') || name.startsWith('domain')) return 'domains';
+    if (id.startsWith('nipo-') || name.contains('nipo')) return 'nipo';
+    return 'keys';
+  }
+
   @override
   Widget build(BuildContext context) {
+    final shown = _list.where((r) => groupOf(r) == _group).toList();
+    String label(String g) {
+      final inG = _list.where((r) => groupOf(r) == g);
+      final due = inG.where((r) => r.daysLeft != null && r.daysLeft! <= RenewalStore.warnDays).length;
+      return '${_groups[g]} (${inG.length})${due > 0 ? ' · $due due' : ''}';
+    }
+
     return ListView(padding: const EdgeInsets.all(32), children: [
       Row(children: [
         Expanded(child: Text('Renewals', style: jost(26, weight: 600))),
         FilledButton.tonal(onPressed: () => _edit(null), child: const Text('+ Add')),
       ]),
       const SizedBox(height: 4),
-      Text('Keys, secrets and memberships that expire. Today warns you ${RenewalStore.warnDays} days before. '
+      Text('Keys, memberships, domains and NIPO trademarks that expire. Today warns you ${RenewalStore.warnDays} days before. '
           'Only dates are kept here (renewals/renewals.json) — never the keys.',
           style: jost(14, color: HqColors.muted)),
       const SizedBox(height: 16),
       if (_error != null) NoteBox(color: HqColors.bad, text: _error!),
       if (_info != null) NoteBox(color: HqColors.good, text: _info!),
-      for (final r in _list) _row(r),
+      Choice<String>(
+        options: {for (final g in _groups.keys) g: label(g)},
+        value: _group,
+        onChanged: (v) => setState(() => _group = v),
+      ),
+      const SizedBox(height: 14),
+      if (shown.isEmpty) Text('Nothing here yet — "+ Add".', style: jost(13, color: HqColors.muted)),
+      for (final r in shown) _row(r),
     ]);
   }
 

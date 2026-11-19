@@ -11,8 +11,8 @@ import '../widgets/screen_frame.dart';
 import '../widgets/source_line.dart';
 
 /// Storage: two pies.
-///   · Databases — size of each Supabase database (free plan: 500 MB EACH). Click a slice or a name → it grows,
-///     and its 5 biggest tables show.
+///   · Databases — one pie PER database (free plan: 500 MB each): its 5 biggest tables + everything else.
+///     Click a slice or a name → it grows.
 ///   · R2 — photo storage per Cloudflare bucket (free: 10 GB for the whole account).
 class StorageScreen extends StatefulWidget {
   const StorageScreen({super.key, required this.data, required this.services});
@@ -33,7 +33,6 @@ class StorageScreen extends StatefulWidget {
 }
 
 class _StorageScreenState extends State<StorageScreen> {
-  int? _db; // chosen database slice
   int? _bucket; // chosen R2 slice
 
   @override
@@ -41,7 +40,7 @@ class _StorageScreenState extends State<StorageScreen> {
     return ScreenFrame(
       title: 'Storage',
       subtitle: 'Databases (Supabase, 500 MB each on the free plan) and photo storage (Cloudflare R2, 10 GB free). '
-          'Click a slice or a name to look closer.',
+          'Each database has its own pie of what fills it — click a slice or a name to look closer.',
       data: widget.data,
       queries: Q.dbSizes,
       body: () => [
@@ -54,81 +53,139 @@ class _StorageScreenState extends State<StorageScreen> {
   }
 
   // ------------------------------------------------------------------ databases
+  // Overview: one SMALL pie per database (used vs its 500 MB). Click one → its detail pie below.
+
+  String? _openDb; // query key of the database whose detail is open
+  int? _pickedSlice; // chosen slice in the detail pie
 
   Widget _databases() {
     final d = widget.data;
-    final rows = <(HqQuery, Map<String, dynamic>?)>[for (final q in Q.dbSizes) (q, d.rows(q)?.firstOrNull)];
-    final loaded = [for (final r in rows) if (r.$2 != null) r];
-    final slices = [
-      for (var i = 0; i < loaded.length; i++)
-        PieSlice(loaded[i].$1.project.name, ((loaded[i].$2!['bytes'] as int?) ?? 0).toDouble(), pieColors[i % pieColors.length]),
-    ];
-    final total = slices.fold(0.0, (a, s) => a + s.value);
-    final chosen = (_db != null && _db! < loaded.length) ? loaded[_db!] : null;
-
+    final open = Q.dbSizes.where((q) => q.key == _openDb).firstOrNull;
+    final openRow = open == null ? null : d.rows(open)?.firstOrNull;
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Wrap(spacing: 28, runSpacing: 16, crossAxisAlignment: WrapCrossAlignment.center, children: [
-        PieChart(
-          slices: slices,
-          selected: _db,
-          onSelect: (i) => setState(() => _db = i),
-          centerText: total == 0 ? null : StorageScreen.size(total),
-        ),
-        SizedBox(
-          width: 420,
-          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            for (var i = 0; i < loaded.length; i++)
-              _legendRow(
-                color: slices[i].color,
-                name: slices[i].label,
-                right: () {
-                  final b = slices[i].value;
-                  final share = b / StorageScreen.dbFree;
-                  return ('${StorageScreen.size(b)} · ${(share * 100).toStringAsFixed(1)}% of 500 MB', _level(share).$2);
-                }(),
-                selected: _db == i,
-                onTap: () => setState(() => _db = _db == i ? null : i),
-              ),
-            for (final r in rows)
-              if (r.$2 == null)
-                Padding(
-                  padding: const EdgeInsets.only(left: 22, top: 6),
-                  child: Text('${r.$1.project.name} — ${d.isNotSet(r.$1) ? 'not connected yet' : 'loading…'}',
-                      style: jost(13, color: HqColors.muted)),
-                ),
-          ]),
-        ),
+      Wrap(spacing: 14, runSpacing: 14, children: [
+        for (final q in Q.dbSizes) _smallCard(q, d.rows(q)?.firstOrNull),
       ]),
-      if (chosen != null) _dbDetail(chosen.$1, chosen.$2!, slices[_db!].color),
+      if (open != null && openRow != null) _dbDetail(open, openRow),
     ]);
   }
 
-  Widget _dbDetail(HqQuery q, Map<String, dynamic> r, Color color) {
-    final bytes = (r['bytes'] as int?) ?? 0;
-    final share = (bytes / StorageScreen.dbFree).clamp(0.0, 1.0);
+  /// Overview tile: a small pie of used vs free (500 MB), the name and the size.
+  Widget _smallCard(HqQuery q, Map<String, dynamic>? r) {
+    final selected = q.key == _openDb;
+    final bytes = ((r?['bytes'] as num?) ?? 0).toDouble();
+    final share = bytes / StorageScreen.dbFree;
+    final level = _level(share).$2;
+    return InkWell(
+      borderRadius: BorderRadius.circular(12),
+      onTap: r == null
+          ? null
+          : () => setState(() {
+                _openDb = selected ? null : q.key;
+                _pickedSlice = null;
+              }),
+      child: Container(
+        width: 170,
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          color: HqColors.surface,
+          border: Border.all(color: selected ? HqColors.accent : HqColors.line, width: selected ? 2 : 1),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Column(children: [
+          if (r == null)
+            SizedBox(
+              height: 96,
+              child: Center(
+                child: Text(widget.data.isNotSet(q) ? 'not connected' : 'loading…',
+                    style: jost(12, color: HqColors.muted)),
+              ),
+            )
+          else
+            IgnorePointer( // the whole tile is the button
+              child: PieChart(
+                size: 96,
+                slices: [
+                  PieSlice('used', bytes, level),
+                  PieSlice('free', (StorageScreen.dbFree - bytes).clamp(0, StorageScreen.dbFree).toDouble(), HqColors.line),
+                ],
+                centerText: '${(share * 100).toStringAsFixed(share < 0.1 ? 1 : 0)}%',
+              ),
+            ),
+          const SizedBox(height: 8),
+          Text(q.project.name, style: jost(14, weight: 600), textAlign: TextAlign.center),
+          Text(r == null ? '–' : '${StorageScreen.size(bytes)} of 500 MB',
+              style: jost(12, color: HqColors.muted), textAlign: TextAlign.center),
+        ]),
+      ),
+    );
+  }
+
+  /// Detail of one database: what fills it — its 5 biggest tables, the rest of your tables,
+  /// and what Supabase itself keeps there (sign-in data, storage records, indexes, system tables).
+  Widget _dbDetail(HqQuery q, Map<String, dynamic> r) {
+    final bytes = ((r['bytes'] as num?) ?? 0).toDouble();
+    final appBytes = ((r['app_bytes'] as num?) ?? 0).toDouble();
+    final share = bytes / StorageScreen.dbFree;
+    final level = _level(share).$2;
     final top = <Map<String, dynamic>>[
       for (final t in (jsonDecode('${r['top'] ?? '[]'}') as List? ?? const [])) Map<String, dynamic>.from(t as Map),
     ];
+    final topSum = top.fold(0.0, (a, t) => a + (t['bytes'] as num).toDouble());
+    final otherApp = (appBytes - topSum).clamp(0.0, double.infinity);
+    final system = (bytes - (appBytes > 0 ? appBytes : topSum)).clamp(0.0, double.infinity);
+    final slices = [
+      for (var i = 0; i < top.length; i++)
+        PieSlice('${top[i]['name']}', (top[i]['bytes'] as num).toDouble(), pieColors[i % pieColors.length]),
+      if (otherApp > 0) PieSlice('your other tables', otherApp, const Color(0xFF8C9AA6)),
+      if (system > 0) PieSlice('Supabase itself (sign-in, storage, system)', system, const Color(0xFFD3D6D9)),
+    ];
     final at = widget.data.loadedAt(q);
-    return _card(color, [
+
+    return _card(HqColors.accent, [
       Row(children: [
-        Expanded(child: Text(q.project.name, style: jost(17, weight: 600))),
-        Text('${StorageScreen.size(bytes)} of 500 MB', style: jost(14, weight: 600, color: _level(share).$2)),
+        Expanded(child: Text(q.project.name, style: jost(18, weight: 600))),
+        Text('${StorageScreen.size(bytes)} of 500 MB · ${(share * 100).toStringAsFixed(1)}%',
+            style: jost(14, weight: 600, color: level)),
+        IconButton(
+          tooltip: 'Close',
+          icon: const Icon(Icons.close, size: 18),
+          onPressed: () => setState(() => _openDb = null),
+        ),
       ]),
-      const SizedBox(height: 8),
-      _bar(share, _level(share).$2),
-      const SizedBox(height: 12),
-      Text('Biggest tables', style: jost(12, weight: 600, color: HqColors.muted)),
-      const SizedBox(height: 4),
-      for (final t in top)
-        Padding(
-          padding: const EdgeInsets.symmetric(vertical: 2),
-          child: Row(children: [
-            Expanded(child: Text('${t['name']}', style: jost(14))),
-            Text(StorageScreen.size(t['bytes'] as num), style: jost(14, weight: 500)),
+      const SizedBox(height: 6),
+      _bar(share.clamp(0.0, 1.0), level),
+      const SizedBox(height: 16),
+      Wrap(spacing: 28, runSpacing: 16, crossAxisAlignment: WrapCrossAlignment.center, children: [
+        PieChart(
+          slices: slices,
+          size: 220,
+          selected: _pickedSlice,
+          onSelect: (i) => setState(() => _pickedSlice = i),
+          centerText: _pickedSlice == null ? StorageScreen.size(bytes) : StorageScreen.size(slices[_pickedSlice!].value),
+        ),
+        SizedBox(
+          width: 440,
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            for (var i = 0; i < slices.length; i++)
+              _legendRow(
+                color: slices[i].color,
+                name: slices[i].label,
+                right: (
+                  '${StorageScreen.size(slices[i].value)} · ${(slices[i].value / (bytes == 0 ? 1 : bytes) * 100).toStringAsFixed(0)}%',
+                  HqColors.ink
+                ),
+                selected: _pickedSlice == i,
+                onTap: () => setState(() => _pickedSlice = _pickedSlice == i ? null : i),
+              ),
           ]),
         ),
-      if (at != null) ...[const SizedBox(height: 8), SourceLine(source: q.source, loadedAt: at)],
+      ]),
+      const SizedBox(height: 8),
+      Text('"Supabase itself" is what every project carries: sign-in accounts, file records, indexes and system '
+          'tables. A new, empty project already uses about 10 MB of it.',
+          style: jost(12, color: HqColors.muted)),
+      if (at != null) ...[const SizedBox(height: 6), SourceLine(source: q.source, loadedAt: at)],
     ]);
   }
 
