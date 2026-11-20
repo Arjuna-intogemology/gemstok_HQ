@@ -9,6 +9,7 @@ import '../db/hq_db.dart';
 import '../db/projects.dart';
 import '../db/queries.dart';
 import '../settings/key_store.dart';
+import '../renewals/zoho_vault.dart';
 
 /// Keeps free-plan Supabase projects from pausing by doing REAL reads (counting each project's
 /// main table — members, stones, follows, conversations, posts…), and counts down the days.
@@ -118,6 +119,7 @@ class HqKeepAlive extends ChangeNotifier {
     }
     // These may run while HQ is locked: don't leave passwords in memory afterwards.
     KeyStore.forget();
+    ZohoVault.forget();
   }
 
   Future<void> pingAll() async {

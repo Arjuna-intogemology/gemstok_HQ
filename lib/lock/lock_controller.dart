@@ -6,6 +6,7 @@ import 'package:local_auth/local_auth.dart';
 
 import '../blogs/blog_api.dart';
 import '../settings/key_store.dart';
+import '../renewals/zoho_vault.dart';
 
 /// Decides whether HQ is locked.
 ///
@@ -86,7 +87,8 @@ class LockController extends ChangeNotifier {
     if (_locked) return;
     _locked = true;
     _autoAsked = false;
-    KeyStore.forget(); // passwords leave memory when HQ locks
+    KeyStore.forget();
+    ZohoVault.forget(); // passwords leave memory when HQ locks
     BlogApi.forget(); // and the blog admin sign-in
     notifyListeners();
   }

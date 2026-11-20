@@ -2,110 +2,6 @@
   "about": "Gemstok HQ renewals — dates only, never keys. Edit in HQ → Renewals (or here; HQ re-reads it).",
   "renewals": [
     {
-      "id": "apple-signin-secret",
-      "name": "Sign in with Apple — client secret",
-      "what": "Apple sign-in on the websites and Android stops working for everyone (iPhone apps keep working).",
-      "lifetime_days": 180,
-      "how_to": "gemstok-backend/docs/runbooks/apple-client-secret.md → paste into Supabase → Gemstok → Authentication → Providers → Apple → Secret Key",
-      "notes": ""
-    },
-    {
-      "id": "apple-developer",
-      "name": "Apple Developer Program membership",
-      "what": "Apps leave the App Store, TestFlight and Sign in with Apple stop.",
-      "lifetime_days": 365,
-      "how_to": "developer.apple.com → Account → Membership (turn on auto-renew)",
-      "notes": ""
-    },
-    {
-      "id": "cloudflare-token",
-      "name": "Cloudflare API token (Gemstok HQ)",
-      "what": "HQ → Websites and the R2 pie stop loading.",
-      "lifetime_days": 365,
-      "how_to": "dash.cloudflare.com → My Profile → API Tokens → Gemstok HQ → Roll, then HQ → Settings → Replace",
-      "notes": "Only if you chose \"1 year\" when making it. No expiry → set no date."
-    },
-    {
-      "id": "admob-signin",
-      "name": "AdMob sign-in in HQ (Google, Testing mode)",
-      "what": "HQ → Money: AdMob turns red.",
-      "lifetime_days": 7,
-      "how_to": "HQ → Settings → Other services → AdMob → Sign in with Google",
-      "notes": "Only while the consent screen is in Testing. \"In production\" → it doesn't expire; remove this."
-    },
-    {
-      "id": "domain-gemstok-com",
-      "name": "Domain — gemstok.com",
-      "what": "Main site, account.gemstok.com, systems.gemstok.com, admin@/legal@ email and Sign in with Apple pages — EVERYTHING Gemstok.",
-      "lifetime_days": 365,
-      "made": "2026-01-02",
-      "how_to": "Your registrar (Porkbun or GoDaddy) → Domains → gemstok.com → check the real expiry date, auto-renew ON, card still valid.",
-      "notes": "Registered 2025-01-02 (Obsidian note says \"02/feb\" — check). Last renewal assumed 2026-01-02. Date is a guess (1-year terms) — read the real expiry at the registrar and fix it here."
-    },
-    {
-      "id": "domain-intogemology-com",
-      "name": "Domain — intogemology.com",
-      "what": "intogemology.com website, courses, blog and its sign-ups.",
-      "lifetime_days": 365,
-      "made": "2026-09-19",
-      "how_to": "Your registrar (Porkbun or GoDaddy) → Domains → intogemology.com → check the real expiry date, auto-renew ON, card still valid.",
-      "notes": "Registered 2025-09-19. Last renewal assumed 2026-09-19. Date is a guess (1-year terms) — read the real expiry at the registrar and fix it here."
-    },
-    {
-      "id": "domain-manikvault-com",
-      "name": "Domain — manikvault.com",
-      "what": "manikvault.com website, app links and privacy/terms pages the stores point to.",
-      "lifetime_days": 365,
-      "made": "2026-03-08",
-      "how_to": "Your registrar (Porkbun or GoDaddy) → Domains → manikvault.com → check the real expiry date, auto-renew ON, card still valid.",
-      "notes": "Registered 2026-03-08. Date is a guess (1-year terms) — read the real expiry at the registrar and fix it here."
-    },
-    {
-      "id": "domain-tracegems-com",
-      "name": "Domain — tracegems.com",
-      "what": "tracegems.com website.",
-      "lifetime_days": 365,
-      "made": "2026-03-08",
-      "how_to": "Your registrar (Porkbun or GoDaddy) → Domains → tracegems.com → check the real expiry date, auto-renew ON, card still valid.",
-      "notes": "Registered 2026-03-08. Date is a guess (1-year terms) — read the real expiry at the registrar and fix it here."
-    },
-    {
-      "id": "domain-quvlet-com",
-      "name": "Domain — quvlet.com",
-      "what": "quvlet.com website and app links.",
-      "lifetime_days": 365,
-      "made": "2026-05-05",
-      "how_to": "Your registrar (Porkbun or GoDaddy) → Domains → quvlet.com → check the real expiry date, auto-renew ON, card still valid.",
-      "notes": "Registered 2026-05-05. Date is a guess (1-year terms) — read the real expiry at the registrar and fix it here."
-    },
-    {
-      "id": "domain-gemmit-app",
-      "name": "Domain — gemmit.app",
-      "what": "gemmit.app website.",
-      "lifetime_days": 365,
-      "made": "2026-05-13",
-      "how_to": "Your registrar (Porkbun or GoDaddy) → Domains → gemmit.app → check the real expiry date, auto-renew ON, card still valid.",
-      "notes": "Registered 2026-05-13. Date is a guess (1-year terms) — read the real expiry at the registrar and fix it here."
-    },
-    {
-      "id": "domain-tracegem-com",
-      "name": "Domain — tracegem.com",
-      "what": "Defensive domain (redirects) — someone else could buy it.",
-      "lifetime_days": 365,
-      "made": "2026-05-14",
-      "how_to": "Your registrar (Porkbun or GoDaddy) → Domains → tracegem.com → check the real expiry date, auto-renew ON, card still valid.",
-      "notes": "Registered 2026-05-14. Date is a guess (1-year terms) — read the real expiry at the registrar and fix it here."
-    },
-    {
-      "id": "domain-traceagem-com",
-      "name": "Domain — traceagem.com",
-      "what": "Defensive domain (redirects to tracegems.com) — someone else could buy it.",
-      "lifetime_days": 365,
-      "made": "2026-05-14",
-      "how_to": "Your registrar (Porkbun or GoDaddy) → Domains → traceagem.com → check the real expiry date, auto-renew ON, card still valid.",
-      "notes": "Registered 2026-05-14. Date is a guess (1-year terms) — read the real expiry at the registrar and fix it here."
-    },
-    {
       "id": "nipo-gemstok",
       "name": "NIPO trademark — GEMSTOK (class 42)",
       "what": "Not registered in Sri Lanka yet (™ claimed only) — someone else could file the name first.",
@@ -239,6 +135,146 @@
       "expires": "2027-01-01",
       "how_to": "NIPO Sri Lanka (nipo.gov.lk) → trademark application, class 41. Class is from the trademarks page — check before filing.",
       "notes": "PLACEHOLDER: 2027-01-01 = planned filing date, not a real expiry. Once registered, set the real date (registration + 10 years) here."
+    },
+    {
+      "id": "domain-gemstok-com",
+      "name": "Domain — gemstok.com",
+      "what": "Main site, account.gemstok.com, systems.gemstok.com, admin@/legal@ email and Sign in with Apple pages — EVERYTHING Gemstok.",
+      "lifetime_days": 365,
+      "made": "2026-01-02",
+      "how_to": "Your registrar (Porkbun or GoDaddy) → Domains → gemstok.com → check the real expiry date, auto-renew ON, card still valid.",
+      "notes": "Registered 2025-01-02 (Obsidian note says \"02/feb\" — check). Last renewal assumed 2026-01-02. Date is a guess (1-year terms) — read the real expiry at the registrar and fix it here."
+    },
+    {
+      "id": "domain-manikvault-com",
+      "name": "Domain — manikvault.com",
+      "what": "manikvault.com website, app links and privacy/terms pages the stores point to.",
+      "lifetime_days": 365,
+      "made": "2026-03-08",
+      "how_to": "Your registrar (Porkbun or GoDaddy) → Domains → manikvault.com → check the real expiry date, auto-renew ON, card still valid.",
+      "notes": "Registered 2026-03-08. Date is a guess (1-year terms) — read the real expiry at the registrar and fix it here."
+    },
+    {
+      "id": "domain-tracegems-com",
+      "name": "Domain — tracegems.com",
+      "what": "tracegems.com website.",
+      "lifetime_days": 365,
+      "made": "2026-03-08",
+      "how_to": "Your registrar (Porkbun or GoDaddy) → Domains → tracegems.com → check the real expiry date, auto-renew ON, card still valid.",
+      "notes": "Registered 2026-03-08. Date is a guess (1-year terms) — read the real expiry at the registrar and fix it here."
+    },
+    {
+      "id": "email-hello-at-quvlet-com",
+      "name": "Email — hello@quvlet.com",
+      "what": "Zoho clears a free mailbox after 120 days without a login.",
+      "lifetime_days": 120,
+      "made": "2026-11-20",
+      "how_to": "Press \"Log in to Zoho\" here (or sign in on the Zoho Mail phone app, then \"Logged in on my phone today\").",
+      "notes": "Set up 2026-11-20 (Zoho Forever Free, quvlet.com)."
+    },
+    {
+      "id": "email-hello-at-manikvault-com",
+      "name": "Email — hello@manikvault.com",
+      "what": "Zoho clears a free mailbox after 120 days without a login.",
+      "lifetime_days": 120,
+      "made": "2026-11-20",
+      "how_to": "Press \"Log in to Zoho\" here (or sign in on the Zoho Mail phone app, then \"Logged in on my phone today\").",
+      "notes": "Zoho free (manikvault.com) — main login. Alias: support@manikvault.com (no login of its own). Also the blog-admin email (that login is Supabase, not Zoho)."
+    },
+    {
+      "id": "email-arjunjay-at-intogemology-com",
+      "name": "Email — arjunjay@intogemology.com",
+      "what": "Zoho clears a free mailbox after 120 days without a login.",
+      "lifetime_days": 120,
+      "made": "2026-11-20",
+      "how_to": "Press \"Log in to Zoho\" here (or sign in on the Zoho Mail phone app, then \"Logged in on my phone today\").",
+      "notes": "Zoho free (intogemology.com) — main login (guess). Aliases probably hello@, auth@, dev@intogemology.com. Contact-form messages + welcome-email replies land here."
+    },
+    {
+      "id": "domain-quvlet-com",
+      "name": "Domain — quvlet.com",
+      "what": "quvlet.com website and app links.",
+      "lifetime_days": 365,
+      "made": "2026-05-05",
+      "how_to": "Your registrar (Porkbun or GoDaddy) → Domains → quvlet.com → check the real expiry date, auto-renew ON, card still valid.",
+      "notes": "Registered 2026-05-05. Date is a guess (1-year terms) — read the real expiry at the registrar and fix it here."
+    },
+    {
+      "id": "domain-gemmit-app",
+      "name": "Domain — gemmit.app",
+      "what": "gemmit.app website.",
+      "lifetime_days": 365,
+      "made": "2026-05-13",
+      "how_to": "Your registrar (Porkbun or GoDaddy) → Domains → gemmit.app → check the real expiry date, auto-renew ON, card still valid.",
+      "notes": "Registered 2026-05-13. Date is a guess (1-year terms) — read the real expiry at the registrar and fix it here."
+    },
+    {
+      "id": "domain-tracegem-com",
+      "name": "Domain — tracegem.com",
+      "what": "Defensive domain (redirects) — someone else could buy it.",
+      "lifetime_days": 365,
+      "made": "2026-05-14",
+      "how_to": "Your registrar (Porkbun or GoDaddy) → Domains → tracegem.com → check the real expiry date, auto-renew ON, card still valid.",
+      "notes": "Registered 2026-05-14. Date is a guess (1-year terms) — read the real expiry at the registrar and fix it here."
+    },
+    {
+      "id": "domain-traceagem-com",
+      "name": "Domain — traceagem.com",
+      "what": "Defensive domain (redirects to tracegems.com) — someone else could buy it.",
+      "lifetime_days": 365,
+      "made": "2026-05-14",
+      "how_to": "Your registrar (Porkbun or GoDaddy) → Domains → traceagem.com → check the real expiry date, auto-renew ON, card still valid.",
+      "notes": "Registered 2026-05-14. Date is a guess (1-year terms) — read the real expiry at the registrar and fix it here."
+    },
+    {
+      "id": "domain-intogemology-com",
+      "name": "Domain — intogemology.com",
+      "what": "intogemology.com website, courses, blog and its sign-ups.",
+      "lifetime_days": 365,
+      "made": "2026-09-19",
+      "how_to": "Your registrar (Porkbun or GoDaddy) → Domains → intogemology.com → check the real expiry date, auto-renew ON, card still valid.",
+      "notes": "Registered 2025-09-19. Last renewal assumed 2026-09-19. Date is a guess (1-year terms) — read the real expiry at the registrar and fix it here."
+    },
+    {
+      "id": "apple-signin-secret",
+      "name": "Sign in with Apple — client secret",
+      "what": "Apple sign-in on the websites and Android stops working for everyone (iPhone apps keep working).",
+      "lifetime_days": 180,
+      "how_to": "gemstok-backend/docs/runbooks/apple-client-secret.md → paste into Supabase → Gemstok → Authentication → Providers → Apple → Secret Key",
+      "notes": ""
+    },
+    {
+      "id": "apple-developer",
+      "name": "Apple Developer Program membership",
+      "what": "Apps leave the App Store, TestFlight and Sign in with Apple stop.",
+      "lifetime_days": 365,
+      "how_to": "developer.apple.com → Account → Membership (turn on auto-renew)",
+      "notes": ""
+    },
+    {
+      "id": "cloudflare-token",
+      "name": "Cloudflare API token (Gemstok HQ)",
+      "what": "HQ → Websites and the R2 pie stop loading.",
+      "lifetime_days": 365,
+      "how_to": "dash.cloudflare.com → My Profile → API Tokens → Gemstok HQ → Roll, then HQ → Settings → Replace",
+      "notes": "Only if you chose \"1 year\" when making it. No expiry → set no date."
+    },
+    {
+      "id": "admob-signin",
+      "name": "AdMob sign-in in HQ (Google, Testing mode)",
+      "what": "HQ → Money: AdMob turns red.",
+      "lifetime_days": 7,
+      "how_to": "HQ → Settings → Other services → AdMob → Sign in with Google",
+      "notes": "Only while the consent screen is in Testing. \"In production\" → it doesn't expire; remove this."
+    },
+    {
+      "id": "email-legal-at-gemstok-com",
+      "name": "Email — legal@gemstok.com",
+      "what": "Zoho clears a free mailbox after 120 days without a login.",
+      "lifetime_days": 120,
+      "made": "2026-11-20",
+      "how_to": "Press \"Log in to Zoho\" here (or sign in on the Zoho Mail phone app, then \"Logged in on my phone today\").",
+      "notes": "gemstok.com — notes don't say where it lives. If it is an alias, change this entry to the main login (Edit), or delete it."
     }
   ]
 }

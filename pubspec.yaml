@@ -15,6 +15,7 @@ dependencies:
   postgres: ^3.5.0                 # read-only DB connections (SSL)
   qr_flutter: ^4.1.0               # campaign QR codes
   dart_jsonwebtoken: ">=2.14.0 <4.0.0"  # signs App Store Connect + Google tokens (on this Mac)
+  webview_flutter: ^4.13.0          # Renewals → Email: log in to Zoho inside HQ (keeps free mailboxes alive)
 
 dev_dependencies:
   flutter_test:

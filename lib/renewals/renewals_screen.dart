@@ -7,6 +7,8 @@ import '../widgets/dispose_later.dart';
 import '../widgets/format.dart';
 import '../widgets/screen_frame.dart';
 import 'renewals_store.dart';
+import 'zoho_login.dart';
+import 'zoho_vault.dart';
 
 Color renewalColor(int? daysLeft) => daysLeft == null
     ? HqColors.muted
@@ -40,10 +42,69 @@ class _RenewalsScreenState extends State<RenewalsScreen> {
   String? _error;
   String? _info;
 
+  /// Mailboxes that have a Zoho password saved in the Keychain (addresses only — never the passwords).
+  Set<String> _pwSet = {};
+
   @override
   void initState() {
     super.initState();
     _load();
+    _loadPw();
+  }
+
+  Future<void> _loadPw() async {
+    try {
+      final s = await ZohoVault.addressesSet();
+      if (mounted) setState(() => _pwSet = s);
+    } catch (_) {}
+  }
+
+  /// Type the password here yourself (never in a chat). Saved to the Keychain; shown only as "set".
+  Future<void> _setPassword(String address) async {
+    final c = TextEditingController();
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text('Zoho password — $address', style: jost(18, weight: 600)),
+        content: SizedBox(
+          width: 420,
+          child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
+            TextField(
+              controller: c,
+              obscureText: true,
+              autofocus: true,
+              enableSuggestions: false,
+              autocorrect: false,
+              decoration: const InputDecoration(labelText: 'Password'),
+              onSubmitted: (_) => Navigator.pop(ctx, true),
+            ),
+            const SizedBox(height: 8),
+            Text('Kept in this Mac\'s Keychain only (not iCloud). HQ uses it only to fill Zoho\'s sign-in page.',
+                style: jost(12, color: HqColors.muted)),
+          ]),
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancel')),
+          FilledButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('Save')),
+        ],
+      ),
+    );
+    final pw = c.text;
+    disposeLater([c]);
+    if (ok != true || pw.isEmpty) return;
+    try {
+      await ZohoVault.set(address, pw);
+      if (mounted) setState(() => _info = 'Password saved for $address (Keychain).');
+    } catch (e) {
+      if (mounted) setState(() => _error = 'Couldn\'t save to the Keychain: $e');
+    }
+    await _loadPw();
+  }
+
+  Future<void> _removePassword(String address) async {
+    await ZohoVault.remove(address);
+    if (mounted) setState(() => _info = 'Password removed for $address.');
+    await _loadPw();
   }
 
   Future<void> _load() async {
@@ -174,10 +235,11 @@ class _RenewalsScreenState extends State<RenewalsScreen> {
     if (ok == true && (r == null || _list.contains(r))) {
       final x = r ??
           Renewal(
-              id: '${switch (_group) { 'domains' => 'domain-', 'nipo' => 'nipo-', _ => '' }}${RenewalStore.newId()}',
-              name: switch (_group) { 'domains' => 'Domain — ', 'nipo' => 'NIPO trademark — ', _ => '' },
-              what: '',
-              lifetimeDays: _group == 'nipo' ? 0 : 365);
+              id: '${switch (_group) { 'domains' => 'domain-', 'nipo' => 'nipo-', 'email' => 'email-', _ => '' }}${RenewalStore.newId()}',
+              name: switch (_group) { 'domains' => 'Domain — ', 'nipo' => 'NIPO trademark — ', 'email' => 'Email — ', _ => '' },
+              what: _group == 'email' ? 'Zoho clears a free mailbox after 120 days without a login.' : '',
+              howTo: _group == 'email' ? 'Press "Log in to Zoho" here (or sign in on the Zoho Mail phone app).' : '',
+              lifetimeDays: switch (_group) { 'nipo' => 0, 'email' => 120, _ => 365 });
       x
         ..name = name.text.trim()
         ..what = what.text.trim()
@@ -192,13 +254,47 @@ class _RenewalsScreenState extends State<RenewalsScreen> {
 
   /// Sub-pages: keys & memberships · domains · NIPO trademarks (from the id or name).
   String _group = 'keys';
-  static const _groups = {'keys': 'Keys & memberships', 'domains': 'Domains', 'nipo': 'NIPO trademarks'};
+  static const _groups = {
+    'keys': 'Keys & memberships',
+    'domains': 'Domains',
+    'email': 'Email',
+    'nipo': 'NIPO trademarks',
+  };
 
   static String groupOf(Renewal r) {
     final id = r.id.toLowerCase(), name = r.name.toLowerCase();
     if (id.startsWith('domain-') || name.startsWith('domain')) return 'domains';
     if (id.startsWith('nipo-') || name.contains('nipo')) return 'nipo';
+    if (id.startsWith('email-') || name.startsWith('email')) return 'email';
     return 'keys';
+  }
+
+  /// "Email — hello@quvlet.com" → hello@quvlet.com
+  static String? addressOf(Renewal r) => RegExp(r'[\w.+-]+@[\w.-]+\.[a-z]{2,}', caseSensitive: false).firstMatch(r.name)?.group(0);
+
+  /// Opens Zoho inside HQ; when the inbox opens, the mailbox is marked "logged in today".
+  Future<bool> _zoho(Renewal r) async {
+    final address = addressOf(r) ?? r.name;
+    final ok = await ZohoLogin.open(context, address);
+    if (ok) {
+      r.made = DateTime.now();
+      await _save();
+      if (mounted) setState(() => _info = '✓ $address — logged in today. Next one due in ${r.lifetimeDays} days.');
+    }
+    return ok;
+  }
+
+  /// One after another: every mailbox that is due (or has no date), oldest first. Stops on Cancel.
+  Future<void> _zohoAll() async {
+    final todo = _list.where((r) => groupOf(r) == 'email' && (r.daysLeft == null || r.daysLeft! <= RenewalStore.warnDays)).toList()
+      ..sort((a, b) => (a.daysLeft ?? -99999).compareTo(b.daysLeft ?? -99999));
+    var done = 0;
+    for (final r in todo) {
+      if (!mounted) return;
+      if (!await _zoho(r)) break;
+      done++;
+    }
+    if (mounted) setState(() => _info = 'Zoho logins done: $done of ${todo.length}.');
   }
 
   @override
@@ -228,6 +324,23 @@ class _RenewalsScreenState extends State<RenewalsScreen> {
         onChanged: (v) => setState(() => _group = v),
       ),
       const SizedBox(height: 14),
+      if (_group == 'email') ...[
+        Row(children: [
+          FilledButton.icon(
+            onPressed: _zohoAll,
+            icon: const Icon(Icons.login, size: 18),
+            label: Text('Log in to all that are due '
+                '(${_list.where((r) => groupOf(r) == 'email' && (r.daysLeft == null || r.daysLeft! <= RenewalStore.warnDays)).length})'),
+          ),
+          const SizedBox(width: 12),
+          Flexible(
+            child: Text('Opens Zoho inside HQ one mailbox at a time. Sign in; when the inbox opens HQ ticks it and moves on. '
+                'Saved passwords (Keychain) are filled in for you; 2-step codes you type.',
+                style: jost(12, color: HqColors.muted)),
+          ),
+        ]),
+        const SizedBox(height: 14),
+      ],
       if (shown.isEmpty) Text('Nothing here yet — "+ Add".', style: jost(13, color: HqColors.muted)),
       for (final r in shown) _row(r),
     ]);
@@ -261,7 +374,24 @@ class _RenewalsScreenState extends State<RenewalsScreen> {
         if (r.notes.isNotEmpty) Text(r.notes, style: jost(12, color: HqColors.muted)),
         const SizedBox(height: 8),
         Wrap(spacing: 8, runSpacing: 6, children: [
-          FilledButton(onPressed: () => _renewedToday(r), child: const Text('Renewed today')),
+          if (groupOf(r) == 'email' && addressOf(r) != null)
+            FilledButton.icon(
+              onPressed: () => _zoho(r),
+              icon: const Icon(Icons.login, size: 16),
+              label: const Text('Log in to Zoho'),
+            ),
+          if (groupOf(r) == 'email' && addressOf(r) != null) ...[
+            OutlinedButton(
+              onPressed: () => _setPassword(addressOf(r)!),
+              child: Text(_pwSet.contains(addressOf(r)!.toLowerCase()) ? 'Password: set · change' : 'Password: not set · set'),
+            ),
+            if (_pwSet.contains(addressOf(r)!.toLowerCase()))
+              TextButton(onPressed: () => _removePassword(addressOf(r)!), child: const Text('Remove password')),
+          ],
+          if (groupOf(r) == 'email')
+            OutlinedButton(onPressed: () => _renewedToday(r), child: const Text('Logged in on my phone today'))
+          else
+            FilledButton(onPressed: () => _renewedToday(r), child: const Text('Renewed today')),
           OutlinedButton(onPressed: () => _pickMade(r), child: const Text('Set the date it was made…')),
           if (r.id == 'apple-signin-secret')
             OutlinedButton(onPressed: () => _readSecret(r), child: const Text('Read the date from the secret…')),
